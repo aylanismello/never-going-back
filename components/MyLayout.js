@@ -1,3 +1,4 @@
+import { Grommet } from 'grommet';
 import Header from "./Header";
 import styled from 'styled-components';
 
@@ -8,10 +9,12 @@ const LayoutStyle = styled.div`
 `;
 
 const Layout = props => (
-  <LayoutStyle>
-    <Header />
-    {props.children}
-  </LayoutStyle>
+  <Grommet>
+    <LayoutStyle>
+      <Header />
+      {props.children}
+    </LayoutStyle>
+  </Grommet>
 );
 
 export default Layout;

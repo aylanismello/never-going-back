@@ -1,4 +1,5 @@
 {
-  "eslint.alwaysShowStatus": true,
-  "eslint.packageManager": "yarn"
+  "eslint.packageManager": "yarn",
+  "eslint.provideLintTask": true,
+  "eslint.alwaysShowStatus": true
 }
