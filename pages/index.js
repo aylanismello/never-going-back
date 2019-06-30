@@ -1,7 +1,7 @@
 /* eslint-disable no-mixed-spaces-and-tabs */
 import React from "react";
-import { Heading, Box, Image } from "grommet";
-import fire from '../helpers/fire';
+import fire from "../helpers/fire";
+import LocationsList from "../components/LocationsList";
 import Layout from "../components/MyLayout";
 import Search from "../components/Search";
 
@@ -16,9 +16,7 @@ class Index extends React.Component {
 
   componentWillMount() {
     this.setState({ loading: true });
-    this.dbRef = fire
-      .ref("locations")
-      .orderByChild("createdAt");
+    this.dbRef = fire.ref("locations").orderByChild("createdAt");
     // https://firebase.google.com/docs/reference/js/firebase.database.Query
 
     this.dbRef.on("value", snapshot => {
@@ -31,8 +29,27 @@ class Index extends React.Component {
     });
   }
 
+  incDownVote(id) {
+    this.setState({ loading: true });
+    const locationRef = fire.ref(`locations/${id}`);
+
+    locationRef
+      .once("value")
+      .then(snapshot => {
+        const downVoteCount = snapshot.val().downVoteCount;
+        snapshot.ref.update({ downVoteCount: downVoteCount + 1 });
+      })
+      .then(() => {
+        this.setState({ loading: false });
+      })
+      .catch(() => {
+        this.setState({ loading: false });
+      });
+  }
+
   async fetchUnsplashImage(query) {
-    const ACCESS_KEY =      "72e26a09a2d8c2615b1a52c5b1ace1b4cdccac44d4a86aebddcaded56e53e958";
+    const ACCESS_KEY =
+      "72e26a09a2d8c2615b1a52c5b1ace1b4cdccac44d4a86aebddcaded56e53e958";
 
     const res = await fetch(`
       https://api.unsplash.com/search/photos?client_id=${ACCESS_KEY}&page=1&per_page=1&query=${query}
@@ -48,9 +65,9 @@ class Index extends React.Component {
     let unsplashData = {};
 
     if (
-      !unsplashImage.errors
-      && unsplashImage.results
-      && unsplashImage.results[0]
+      !unsplashImage.errors &&
+      unsplashImage.results &&
+      unsplashImage.results[0]
     ) {
       unsplashData = unsplashImage.results[0];
     }
@@ -89,17 +106,15 @@ class Index extends React.Component {
     console.log(id);
 
     this.setState({ loading: true });
-    fire
-      .ref(`locations/${id}`)
-      .once("value", snapshot => {
-        if (!snapshot.exists()) {
-          this.addShit(location, id);
-          // const email = snapshot.val();
-        } else {
-          // do some other shit
-          this.setState({ loading: false });
-        }
-      });
+    fire.ref(`locations/${id}`).once("value", snapshot => {
+      if (!snapshot.exists()) {
+        this.addShit(location, id);
+        // const email = snapshot.val();
+      } else {
+        // do some other shit
+        this.setState({ loading: false });
+      }
+    });
   }
 
   render() {
@@ -110,26 +125,10 @@ class Index extends React.Component {
         <h1>Suggested Locations</h1>
         {loading ? <p>loading</p> : <p>we good</p>}
         <Search selectLocation={s => this.selectLocation(s)} />
-        {locations.map(location => (
-          <Box>
-            <Box height="small" width="small">
-              <Image
-                fit="cover"
-                src={
-                  location.unsplashData
-                    ? location.unsplashData.urls.small
-                    : "https://images.unsplash.com/photo-1521137959136-6bc78e585f23?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=400&fit=max&ixid=eyJhcHBfaWQiOjEzNTU1fQ"
-                }
-              />
-            </Box>
-            <Box>
-              <Heading margin="xsmall">{location.address.city}</Heading>
-              <Heading size="small" margin="xsmall">
-                {location.address.country}
-              </Heading>
-            </Box>
-          </Box>
-        ))}
+        <LocationsList
+          locations={locations}
+          incDownVote={id => this.incDownVote(id)}
+        />
       </Layout>
     );
   }
