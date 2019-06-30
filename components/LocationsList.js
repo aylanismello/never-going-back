@@ -30,9 +30,9 @@ export default ({
       onActive={idx => switchLocationSortType(idx)}
       activeIndex={locationSortType}
     >
-      <Tab title="recent" />
-      <Tab title="worst" />
-      <Tab title="best" />
+      {Object.keys(tabs).map((tab, idx) => (
+        <Tab title={tab} />
+      ))}
     </Tabs>
     <InfiniteScroll items={locations}>
       {location => (

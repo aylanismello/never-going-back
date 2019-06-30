@@ -1,5 +1,6 @@
-import firebase from "firebase/app";
-import "firebase/database";
+
+// import firebase from "firebase/app";
+// import "firebase/database";
 
 
 // https://console.firebase.google.com/u/0/project/aylanisdope/database/aylanisdope/data
@@ -18,6 +19,11 @@ const firebaseConfig = {
 
 //  https://firebase.google.com/docs/database/web/start?authuser=0
 
-firebase.initializeApp(firebaseConfig);
 
-export default firebase.database();
+// firebase.database();
+export default async () => {
+  const firebase = await import('firebase/app');
+  await import("firebase/database");
+  firebase.initializeApp(firebaseConfig);
+  return firebase.database();
+}

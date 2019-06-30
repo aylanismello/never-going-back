@@ -1,4 +1,3 @@
-/* eslint-disable no-mixed-spaces-and-tabs */
 import React from "react";
 import fire from "../helpers/fire";
 import LocationsList from "../components/LocationsList";
@@ -7,25 +6,40 @@ import Search from "../components/Search";
 
 const hereToFirebaseId = hereId => hereId.replace(/\./g, "");
 
+
 class Index extends React.Component {
   state = Object.freeze({
+    firebaseInit: false,
     loading: false,
     err: undefined,
     locations: [],
     locationSortType: 0
   });
 
-  componentWillMount() {
+  async initFireDB() {
+    this.fireDB = await fire();
+    // const fireDB = await fire();
+    // this.setState({ firbaseInit: true });
     this.initLocationListener();
   }
 
+  componentWillMount() {
+    this.initFireDB();
+  }
+
+  componentWillUpdate(nextProps, nextState) {
+    // if (!nextState.firebaseInit && this.state.firebaseInit) {
+    //   this.initLocationListener();
+    // }
+  }
+
   initLocationListener(locationSortType = 0) {
-    this.setState({ loading: true });
+    // this.setState({ loading: true });
     
     if (locationSortType === 0) {
-      this.dbRef = fire.ref("locations").orderByChild("createdAt");
+      this.dbRef = this.fireDB.ref("locations").orderByChild("createdAt");
     } else {
-      this.dbRef = fire.ref("locations").orderByChild("downVoteCount");
+      this.dbRef = this.fireDB.ref("locations").orderByChild("downVoteCount");
     }
     // https://firebase.google.com/docs/reference/js/firebase.database.Query
 
@@ -47,7 +61,7 @@ class Index extends React.Component {
 
   incDownVote(id) {
     this.setState({ loading: true });
-    const locationRef = fire.ref(`locations/${id}`);
+    const locationRef = this.fireDB.ref(`locations/${id}`);
 
     locationRef
       .once("value")
@@ -117,11 +131,9 @@ class Index extends React.Component {
     // stackoverflow.com/questions/37910008/check-if-value-exists-in-firebase-db
     const { locationId } = location;
     const id = hereToFirebaseId(locationId);
-    console.log(locationId);
-    console.log(id);
 
     this.setState({ loading: true });
-    fire.ref(`locations/${id}`).once("value", snapshot => {
+    this.fireDB.ref(`locations/${id}`).once("value", snapshot => {
       if (!snapshot.exists()) {
         this.addShit(location, id);
         // const email = snapshot.val();

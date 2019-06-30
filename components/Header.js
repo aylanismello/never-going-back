@@ -1,6 +1,6 @@
 import Link from "next/link";
 import styled from 'styled-components';
-
+// https://res.cloudinary.com/burncartel/image/upload/v1561906021/gringo-city-night.jpg
 
 const LinkStyle = styled.a`
   margin-right: 15px;
