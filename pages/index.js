@@ -11,19 +11,35 @@ class Index extends React.Component {
   state = Object.freeze({
     loading: false,
     err: undefined,
-    locations: []
+    locations: [],
+    locationSortType: 0
   });
 
   componentWillMount() {
+    this.initLocationListener();
+  }
+
+  initLocationListener(locationSortType = 0) {
     this.setState({ loading: true });
-    this.dbRef = fire.ref("locations").orderByChild("createdAt");
+    
+    if (locationSortType === 0) {
+      this.dbRef = fire.ref("locations").orderByChild("createdAt");
+    } else {
+      this.dbRef = fire.ref("locations").orderByChild("downVoteCount");
+    }
     // https://firebase.google.com/docs/reference/js/firebase.database.Query
 
     this.dbRef.on("value", snapshot => {
       const locations = [];
       snapshot.forEach(childSnapshot => {
-        // to 'reverse' the list
-        locations.unshift(childSnapshot.val());
+        const location = childSnapshot.val();
+
+        if (locationSortType !== 2) {
+          locations.unshift(location);
+        } else {
+          locations.push(location);
+        }
+        
       });
       this.setState({ locations, loading: false });
     });
@@ -48,8 +64,7 @@ class Index extends React.Component {
   }
 
   async fetchUnsplashImage(query) {
-    const ACCESS_KEY =
-      "72e26a09a2d8c2615b1a52c5b1ace1b4cdccac44d4a86aebddcaded56e53e958";
+    const ACCESS_KEY =      "72e26a09a2d8c2615b1a52c5b1ace1b4cdccac44d4a86aebddcaded56e53e958";
 
     const res = await fetch(`
       https://api.unsplash.com/search/photos?client_id=${ACCESS_KEY}&page=1&per_page=1&query=${query}
@@ -65,9 +80,9 @@ class Index extends React.Component {
     let unsplashData = {};
 
     if (
-      !unsplashImage.errors &&
-      unsplashImage.results &&
-      unsplashImage.results[0]
+      !unsplashImage.errors
+      && unsplashImage.results
+      && unsplashImage.results[0]
     ) {
       unsplashData = unsplashImage.results[0];
     }
@@ -117,8 +132,14 @@ class Index extends React.Component {
     });
   }
 
+  switchLocationSortType(locationSortType) {
+    this.setState({ locationSortType });
+    this.dbRef.off("value");
+    this.initLocationListener(locationSortType);
+  }
+
   render() {
-    const { loading, locations } = this.state;
+    const { loading, locations, locationSortType } = this.state;
 
     return (
       <Layout>
@@ -128,6 +149,8 @@ class Index extends React.Component {
         <LocationsList
           locations={locations}
           incDownVote={id => this.incDownVote(id)}
+          locationSortType={locationSortType}
+          switchLocationSortType={idx => this.switchLocationSortType(idx)}
         />
       </Layout>
     );

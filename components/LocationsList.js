@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import {
- Heading, Box, Image, InfiniteScroll, Text, Grid
+ Heading, Box, Image, InfiniteScroll, Text, Grid, Tabs, Tab
 } from "grommet";
 import { CaretDown } from "grommet-icons";
 
@@ -12,8 +12,28 @@ const DownVote = styled(CaretDown)`
   }
 `;
 
-export default ({ locations, incDownVote }) => (
-  <Box>
+const tabs = {
+  recent: 0,
+  worst: 1,
+  best: 2
+};
+
+export default ({
+  locations,
+  incDownVote,
+  locationSortType,
+  switchLocationSortType
+}) => (
+  <Box className="LocationsList">
+    <Tabs
+      alignSelf="start"
+      onActive={idx => switchLocationSortType(idx)}
+      activeIndex={locationSortType}
+    >
+      <Tab title="recent" />
+      <Tab title="worst" />
+      <Tab title="best" />
+    </Tabs>
     <InfiniteScroll items={locations}>
       {location => (
         <Grid
@@ -55,7 +75,7 @@ export default ({ locations, incDownVote }) => (
               <Text>💩</Text>
               <Text>{location.downVoteCount}</Text>
             </Box>
-            <DownVote onClick={() => incDownVote(location.id) }/>
+            <DownVote onClick={() => incDownVote(location.id)} />
           </Box>
         </Grid>
       )}
