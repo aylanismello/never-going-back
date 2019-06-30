@@ -26,7 +26,7 @@ class Search extends React.Component {
     // https://developer.here.com/documentation/geocoder-autocomplete/topics/quick-start-get-suggestions.html
 
     const res = await fetch(`
-      http://autocomplete.geocoder.api.here.com/6.2/suggest.json?app_id=${HERE_APP_ID}&app_code=${HERE_APP_CODE}&query=${query}&resultType=areas
+      https://autocomplete.geocoder.api.here.com/6.2/suggest.json?app_id=${HERE_APP_ID}&app_code=${HERE_APP_CODE}&query=${query}&resultType=areas
     `);
     const data = await res.json();
     const { suggestions } = data;

@@ -24,6 +24,9 @@ const firebaseConfig = {
 export default async () => {
   const firebase = await import('firebase/app');
   await import("firebase/database");
-  firebase.initializeApp(firebaseConfig);
+  if (!firebase.apps.length) {
+    // firebase.initializeApp({});
+    firebase.initializeApp(firebaseConfig);
+  }
   return firebase.database();
 }

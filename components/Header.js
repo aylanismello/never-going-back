@@ -14,12 +14,12 @@ const LinkStyle = styled.a`
 
 const Header = () => (
   <div>
-    <Link href="/">
+    {/* <Link href="/">
       <LinkStyle>Home</LinkStyle>
     </Link>
     <Link href="/about">
       <LinkStyle>About</LinkStyle>
-    </Link>
+    </Link> */}
   </div>
 );
 

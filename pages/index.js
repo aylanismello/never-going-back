@@ -18,19 +18,12 @@ class Index extends React.Component {
 
   async initFireDB() {
     this.fireDB = await fire();
-    // const fireDB = await fire();
-    // this.setState({ firbaseInit: true });
+    this.setState({ firebaseInit: true });
     this.initLocationListener();
   }
 
   componentWillMount() {
     this.initFireDB();
-  }
-
-  componentWillUpdate(nextProps, nextState) {
-    // if (!nextState.firebaseInit && this.state.firebaseInit) {
-    //   this.initLocationListener();
-    // }
   }
 
   initLocationListener(locationSortType = 0) {
@@ -103,7 +96,7 @@ class Index extends React.Component {
 
     const todaysDate = JSON.stringify(new Date());
 
-    fire
+    this.fireDB
       .ref(`locations/${id}`)
       .set({
         ...location,
