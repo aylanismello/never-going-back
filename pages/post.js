@@ -1,5 +1,6 @@
-import Layout from "../components/MyLayout.js";
+import React from 'react';
 import fetch from "isomorphic-unfetch";
+import Layout from "../components/MyLayout";
 
 const Post = props => (
   <Layout>
@@ -9,7 +10,7 @@ const Post = props => (
   </Layout>
 );
 
-Post.getInitialProps = async function(context) {
+Post.getInitialProps = async function (context) {
   const { id } = context.query;
   const res = await fetch(`https://api.tvmaze.com/shows/${id}`);
   const show = await res.json();

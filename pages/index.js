@@ -1,11 +1,11 @@
 import React from "react";
 import fire from "../helpers/fire";
+import Header from "../components/Header";
 import LocationsList from "../components/LocationsList";
 import Layout from "../components/MyLayout";
 import Search from "../components/Search";
 
 const hereToFirebaseId = hereId => hereId.replace(/\./g, "");
-
 
 class Index extends React.Component {
   state = Object.freeze({
@@ -13,12 +13,14 @@ class Index extends React.Component {
     loading: false,
     err: undefined,
     locations: [],
+    locationsFromThisSession: [],
     locationSortType: 0
   });
 
   async initFireDB() {
+    this.setState({ loading: true });
     this.fireDB = await fire();
-    this.setState({ firebaseInit: true });
+    this.setState({ firebaseInit: true, loading: false });
     this.initLocationListener();
   }
 
@@ -27,8 +29,8 @@ class Index extends React.Component {
   }
 
   initLocationListener(locationSortType = 0) {
-    // this.setState({ loading: true });
-    
+    this.setState({ loading: true });
+
     if (locationSortType === 0) {
       this.dbRef = this.fireDB.ref("locations").orderByChild("createdAt");
     } else {
@@ -46,7 +48,6 @@ class Index extends React.Component {
         } else {
           locations.push(location);
         }
-        
       });
       this.setState({ locations, loading: false });
     });
@@ -63,7 +64,7 @@ class Index extends React.Component {
         snapshot.ref.update({ downVoteCount: downVoteCount + 1 });
       })
       .then(() => {
-        this.setState({ loading: false });
+        this.setState({ loading: false, locationsFromThisSession: [id, ...this.state.locationsFromThisSession] });
       })
       .catch(() => {
         this.setState({ loading: false });
@@ -71,7 +72,8 @@ class Index extends React.Component {
   }
 
   async fetchUnsplashImage(query) {
-    const ACCESS_KEY =      "72e26a09a2d8c2615b1a52c5b1ace1b4cdccac44d4a86aebddcaded56e53e958";
+    const ACCESS_KEY =
+      "72e26a09a2d8c2615b1a52c5b1ace1b4cdccac44d4a86aebddcaded56e53e958";
 
     const res = await fetch(`
       https://api.unsplash.com/search/photos?client_id=${ACCESS_KEY}&page=1&per_page=1&query=${query}
@@ -87,9 +89,9 @@ class Index extends React.Component {
     let unsplashData = {};
 
     if (
-      !unsplashImage.errors
-      && unsplashImage.results
-      && unsplashImage.results[0]
+      !unsplashImage.errors &&
+      unsplashImage.results &&
+      unsplashImage.results[0]
     ) {
       unsplashData = unsplashImage.results[0];
     }
@@ -144,15 +146,17 @@ class Index extends React.Component {
   }
 
   render() {
-    const { loading, locations, locationSortType } = this.state;
+    const { loading, locations, locationSortType, locationsFromThisSession } = this.state;
 
     return (
       <Layout>
-        <h1>Suggested Locations</h1>
-        {loading ? <p>loading</p> : <p>we good</p>}
-        <Search selectLocation={s => this.selectLocation(s)} />
+        <Header>
+          <Search selectLocation={location => this.selectLocation(location)} />
+        </Header>
         <LocationsList
+          loading={loading}
           locations={locations}
+          locationsFromThisSession={locationsFromThisSession}
           incDownVote={id => this.incDownVote(id)}
           locationSortType={locationSortType}
           switchLocationSortType={idx => this.switchLocationSortType(idx)}

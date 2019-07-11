@@ -1,10 +1,4 @@
-
-// import firebase from "firebase/app";
-// import "firebase/database";
-
-
 // https://console.firebase.google.com/u/0/project/aylanisdope/database/aylanisdope/data
-
 //  https://firebase.google.com/docs/database/web/structure-data?authuser=0
 
 const firebaseConfig = {
@@ -16,17 +10,13 @@ const firebaseConfig = {
   messagingSenderId: "753431802863",
   appId: "1:753431802863:web:a4fedd8c7e7da852"
 };
-
-//  https://firebase.google.com/docs/database/web/start?authuser=0
-
-
-// firebase.database();
 export default async () => {
-  const firebase = await import('firebase/app');
+  const firebase = await import("firebase/app");
   await import("firebase/database");
   if (!firebase.apps.length) {
-    // firebase.initializeApp({});
+    //github.com/zeit/next.js/issues/1999
+    // Firebase: Firebase App named '[DEFAULT]' already exists (app/duplicate-app).
     firebase.initializeApp(firebaseConfig);
   }
   return firebase.database();
-}
+};
